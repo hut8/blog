@@ -1,0 +1,72 @@
+{{ partial "header.html" . }}
+  <body>
+    <a name="about"></a>
+    <div class="intro-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-message">
+                        <h1>Hut 8</h1>
+                        <h3>
+                          <i class="fa fa-user fa-fw"></i>
+                          Liam Bowen
+                        </h3>
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a href="/blog" class="btn btn-default btn-lg"><i class="fa fa-book fa-fw"></i> <span class="network-name">Blog</span></a>
+                            </li>
+                            <li>
+                                <a href="https://twitter.com/XorRaxRax" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/hut8" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                            </li>
+                            <li>
+                                <a href="https://linkedin.com/in/liambowen" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Linkedin</span></a>
+                            </li>
+                            <li>
+                                <a href="#" id="email-link" class="btn btn-default btn-lg">
+                                  <i class="fa fa-envelope fa-fw"></i>
+                                  <span class="network-name">
+                                    Email <noscript>[Needs JS]</noscript>
+                                  </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="credit-footer">
+                      <span>
+                        Background image: <a href="https://www.flickr.com/photos/mendhak/5125496254">@mendhak</a> | Powered by <a href="http://gohugo.io/">Hugo</a>
+                      </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.intro-header -->
+  </body>
+
+  <script>
+   $(function() {
+     // because spam.
+     var coded = "Jd2QZUMix@WQ2dJ.aUQ";
+     var key = "bLpkHwymheEcJ65GjS0ZCt8gMfQqinaX4NuvIoTzsOWR3r7dx21DYAPlUVF9KB";
+     var shift=coded.length;
+     var addr="";
+     for (i=0; i<coded.length; i++) {
+       if (key.indexOf(coded.charAt(i))==-1) {
+         ltr = coded.charAt(i);
+         addr += (ltr);
+       }
+       else {
+         ltr = (key.indexOf(coded.charAt(i))-shift+key.length) % key.length;
+         addr += (key.charAt(ltr));
+       }
+     }
+     $("#email-link").attr("href", "mailto:"+addr);
+   });
+  </script>
+
+</html>

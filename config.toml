@@ -1,0 +1,4 @@
+baseurl = "http://hut8.io/"
+languageCode = "en-us"
+title = "Hut 8"
+theme = "hut8"
