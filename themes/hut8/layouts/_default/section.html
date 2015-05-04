@@ -3,61 +3,34 @@
 
 <body>
   <link rel="stylesheet" href="/css/{{ $pagecss }}" type="text/css">
-  <header class="navbar navbar-default navbar-fixed-top" role="banner">
-  <div class="container">
-    <div class="navbar-header">
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a href="/" class="navbar-brand">Hut8.io</a>
-    </div>
-    <nav class="collapse navbar-collapse" role="navigation">
-      <ul class="nav navbar-nav">
-        <li>
-          <a href="/blog">Blog</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</header>
-
-
-
-<div id="masthead">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-7">
-        <h1>Hut8.io Blog</h1>
-          <p class="lead">Insert subtitle here</p>
-        </h1>
-      </div>
-    </div>
-  </div>
-</div>
-
+  {{ partial "navbar.html" . }}
 
 <div class="container">
   <div class="row">
     <div class="col-md-12">
       <div class="panel">
         <div class="panel-body">
-          <!--/stories-->
           {{ range first 10 .Data.Pages }}
 	  <div class="row">
             <br>
             <div class="col-md-2 col-sm-3 text-center">
-              <a class="story-img" href="#"><img src="//placehold.it/100" style="width:100px;height:100px" class="img-circle"></a>
+              <a class="story-img" href="#">
+                <img src="/img/{{ .Params.icon }}" style="width:100px;height:100px">
+              </a>
             </div>
             <div class="col-md-10 col-sm-9">
-              <h3>{{ .Title }}</h3>
+              <h3>
+                <a href="{{ .Permalink }}">{{ .Title }}</a>
+              </h3>
               <div class="row">
                 <div class="col-xs-9">
                   <p>{{ .Summary }}</p>
                   {{ if .Truncated }}
-                  <p class="lead"><button class="btn btn-default">Read More</button></p>
+                    <p class="lead">
+                      <a href="{{ .Permalink }}" class="btn btn-primary pull-right btnNext">
+                        Read <i class="glyphicon glyphicon-chevron-right"></i>
+                      </a>
+                    </p>
                   {{ end }}
 
                   <p class="pull-right">
@@ -65,7 +38,13 @@
                     <span class="label label-default">{{ . }}</span>
                     {{ end }}
                   </p>
-                  <ul class="list-inline"><li><a href="#">2 Days Ago</a></li><li><a href="{{ .Permalink }}"><i class="glyphicon glyphicon-comment"></i> 4 Comments</a></li><li><a href="#"><i class="glyphicon glyphicon-share"></i> 34 Shares</a></li></ul>
+                  <ul class="list-inline">
+                    <li>
+                      <span class="glyphicon glyphicon-time"></span>
+                      {{ .Date.Format "2006-01-02" }}
+                    </li>
+                    <li><a href="{{ .Permalink }}">Permalink</a></li>
+                  </ul>
                   </div>
                 <div class="col-xs-3"></div>
               </div>
@@ -74,19 +53,13 @@
           </div>
           <hr>
           {{ end }}
+
           <a href="/" class="btn btn-primary pull-right btnNext">More <i class="glyphicon glyphicon-chevron-right"></i></a>
         </div>
       </div>
     </div>
   </div>
 </div>
-    <article class="post">
-      <a href="">
-        <h2></h2>
-      </a>
-    </article>
-
-  </ul>
 </body>
 
 {{ partial "footer.html" . }}
