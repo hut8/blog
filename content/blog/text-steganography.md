@@ -2,6 +2,7 @@
 date = "2014-01-26T21:44:54-05:00"
 title = "Text Steganography"
 tags = [ "steganography", "security", "encoding", "cryptography" ]
+icon = "padlock15.svg"
 +++
 
 Steganography is the practice of hiding data within other data, such that a third party doesn't suspect the presence of the hidden data (the "payload") inside of the readily apparent data (the "carrier" or "canvas").  The type of the carrier is known as a "channel," which in this case is a Unicode text document.  Some parts can be adapted to plain ASCII.  All of these methods are easily detectable programatically, as they involve unusual character sequences, such as Cyrillic characters in an otherwise Latin word.
