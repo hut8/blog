@@ -47,27 +47,8 @@
         <!-- /.container -->
     </div>
     <!-- /.intro-header -->
+
+    {{ partial "footer.html" . }}
+
   </body>
-
-  <script>
-   $(function() {
-     // because spam.
-     var coded = "Jd2QZUMix@WQ2dJ.aUQ";
-     var key = "bLpkHwymheEcJ65GjS0ZCt8gMfQqinaX4NuvIoTzsOWR3r7dx21DYAPlUVF9KB";
-     var shift=coded.length;
-     var addr="";
-     for (i=0; i<coded.length; i++) {
-       if (key.indexOf(coded.charAt(i))==-1) {
-         ltr = coded.charAt(i);
-         addr += (ltr);
-       }
-       else {
-         ltr = (key.indexOf(coded.charAt(i))-shift+key.length) % key.length;
-         addr += (key.charAt(ltr));
-       }
-     }
-     $("#email-link").attr("href", "mailto:"+addr);
-   });
-  </script>
-
 </html>
