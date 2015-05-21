@@ -62,7 +62,67 @@ Typically, a space is typeset with 1/4 em width.  So, that should display identi
 
 This simplified implementation only uses `U+200B` and `U+FEFF` to encode arbitrary data.  You could append data into a canvas using shell redirection, `cat` and this utility.
 
-{% include_code 'Unicode Spaces Steganography' lang:ruby space-stego/unicode-space-steganography.rb %}
+```ruby
+#!/usr/bin/env ruby
+
+class UnicodeSpaceStegoEngine
+  def initialize(stream)
+    @stream = stream
+  end
+
+  # Decode U+200B => 0
+  #        U+FEFF => 1
+  def decode
+    byte = 0
+    bit_ix = 0
+    @stream.each_char do |char|
+      case char
+      when [0x200B].pack('U') # Unset bit
+        byte &= (~(1 << bit_ix))
+        bit_ix += 1
+      when [0xFEFF].pack('U') # Set bit
+        byte |= (1 << bit_ix)
+        bit_ix += 1
+      end
+      if bit_ix == 8
+        write([byte].pack("C"))
+        byte = 0
+        bit_ix = 0
+      end
+    end
+  end
+
+  # Encode 0 => U+200B
+  #        1 => U+FEFF
+  def encode
+    @stream.each_byte do |byte|
+      (0..7).each do |bit_ix|
+        set_bit = (byte & (1 << bit_ix)) != 0
+        codepoint = set_bit ? 0xFEFF : 0x200B
+        print [codepoint].pack 'U'
+      end
+    end
+  end
+end
+
+# CLI Follows
+def usage
+  puts "usage: #{$0} <encode|decode> [data_file, ...]"
+  puts "or     #{$0} <encode|decode> < data"
+end
+
+operation = ARGV.shift
+engine = UnicodeSpaceStegoEngine.new(ARGF)
+
+case operation
+when "encode"
+  engine.encode
+when "decode"
+  engine.decode
+else
+  usage
+end
+```
 
 ### Cyrillic Characters
 
