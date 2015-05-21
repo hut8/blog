@@ -1,63 +1,98 @@
 {{ partial "header.html" . }}
 
-<body style="margin-top: 100px">
+<body style="margin-top: 60px">
   {{ partial "navbar.html" . }}
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="panel">
-        <div class="panel-body">
-          {{ range first 10 .Data.Pages }}
-	  <div class="row">
-            <br>
-            <div class="col-md-2 col-sm-3 text-center">
-              <a class="story-img" href="#">
-                <img src="/img/{{ .Params.icon }}" style="width:100px;height:100px">
-              </a>
-            </div>
-            <div class="col-md-10 col-sm-9">
-              <h3>
-                <a href="{{ .Permalink }}">{{ .Title }}</a>
-              </h3>
-              <div class="row">
-                <div class="col-xs-9">
-                  <p>{{ .Summary }}</p>
-                  {{ if .Truncated }}
-                    <p class="lead">
-                      <a href="{{ .Permalink }}" class="btn btn-primary pull-right btnNext">
-                        Read <i class="glyphicon glyphicon-chevron-right"></i>
-                      </a>
-                    </p>
-                  {{ end }}
-
-                  <p class="pull-right">
-                    {{ range .Params.tags }}
-                    <span class="label label-default">{{ . }}</span>
-                    {{ end }}
-                  </p>
-                  <ul class="list-inline">
-                    <li>
-                      <span class="glyphicon glyphicon-time"></span>
-                      {{ .Date.Format "2006-01-02" }}
-                    </li>
-                    <li><a href="{{ .Permalink }}">Permalink</a></li>
-                  </ul>
-                  </div>
-                <div class="col-xs-3"></div>
-              </div>
-              <br><br>
-            </div>
-          </div>
-          <hr>
-          {{ end }}
-
-          <a href="/" class="btn btn-primary pull-right btnNext">More <i class="glyphicon glyphicon-chevron-right"></i></a>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+      </div>
+      <div class="col-md-9">
+        <div class="page-header">
+          <h1>
+            <i class="fa fa-book fa-fw"></i>
+            Liam Bowen's Blog
+          </h1>
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Post Tags</h3>
+          </div>
+
+          <!-- tags -->
+          <div class="panel-body">
+            <ul class="nav">
+              {{ range $key, $taxonomy := .Site.Taxonomies.tags }}
+              <li>
+                <a href="/tags/{{ $key | urlize }}">
+                  <span class="badge pull-right">{{ $taxonomy.Pages | len }}</span>
+                  {{ $key }}
+                </a>
+              </li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column with articles in it -->
+      <div class="col-md-9">
+        {{ range first 30 .Data.Pages }}
+	<div class="row">
+          <br>
+          <div class="col-md-2 col-sm-3 text-center">
+            <a class="story-img" href="{{ .Permalink }}">
+              <img src="/img/{{ .Params.icon }}" style="width:100px;height:100px">
+            </a>
+          </div>
+          <div class="col-md-10 col-sm-9">
+            <h3>
+              <a href="{{ .Permalink }}">{{ .Title }}</a>
+            </h3>
+            <div class="row">
+              <div class="col-xs-9">
+                <p>{{ .Summary }}</p>
+
+                <div class="row">
+                  <div class="col-xs-3">
+                      <span class="glyphicon glyphicon-time"></span>
+                      {{ .Date.Format "2006-01-02" }}
+                  </div>
+                  <div class="col-xs-9" style="text-align:right">
+                    {{ range .Params.tags }}
+                    &nbsp;
+                    <a href="/tags/{{ . | urlize}}" class="label label-default">
+                      {{ . }}
+                    </a>
+                    {{ end }}
+                  </div>
+                </div>
+                <br/>
+                {{ if .Truncated }}
+                <div class="row">
+                  <div class="col-xs-12">
+                    <a href="{{ .Permalink }}" class="btn btn-primary pull-right btnNext">
+                      Read <i class="glyphicon glyphicon-chevron-right"></i>
+                    </a>
+                  </div>
+                </div>
+                {{ end }}
+              </div>
+              <div class="col-xs-3"></div>
+            </div>
+            <br><br>
+          </div>
+        </div>
+        <hr>
+        {{ end }}
+      </div>
+    </div>
   </div>
-</div>
 </body>
 
 {{ partial "footer.html" . }}
