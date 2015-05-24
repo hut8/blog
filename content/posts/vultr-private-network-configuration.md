@@ -6,8 +6,6 @@ tags = [ "vultr", "networking", "debian", "ubuntu", "performance", "vps" ]
 icon = "plug42.svg"
 +++
 
-## Configuring [vultr.com](http://www.vultr.com/?ref=6831514)'s Private Network
-
 ### for Debian/Ubuntu
 
 [Vultr.com](http://www.vultr.com/?ref=6831514) has a cool feature where you can set up a private network between all of your instances. This provides three advantages:
@@ -55,6 +53,8 @@ TCP window size: 45.0 KByte (default)
 
 *Crazy fast!*
 
+<hr>
+
 #### MTU setting
 
 I was pretty disappointed at first when the MTU was set to (the default) 1500:
@@ -69,6 +69,8 @@ TCP window size: 45.0 KByte (default)
 [ ID] Interval       Transfer     Bandwidth
 [  3] 0.0-779.6 sec  1.00 GBytes   11.0 Mbits/sec
 ```
+
+[These vultr.com docs](https://www.vultr.com/docs/configuring-private-network) don't mention the MTU issue, although on the dashboard there's a mention of it if you click a button for more information.
 
 As you can see, a difference of __6200%__!
 
