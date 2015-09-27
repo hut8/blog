@@ -2,7 +2,7 @@
 date = "2015-09-27T17:00:45-04:00"
 draft = false
 title = "Using Dropbox on Windows with Junctions and Hard Links"
-tags = [ "dropbox", "file-systems", "windows", "source-control" ]
+tags = [ "dropbox", "file-systems", "windows", "source-control", "emacs" ]
 icon = "windows.svg"
 +++
 
