@@ -1,9 +1,11 @@
 +++
 date = "2015-09-27T17:00:45-04:00"
 draft = false
-title = "Using Dropbox on Windows with Junctions and Hard Links"
+title = "Dropbox on Windows: Junctions and Hard Links"
 tags = [ "dropbox", "file-systems", "windows", "source-control", "emacs" ]
-icon = "windows.svg"
+cardthumbimage = "images/dropbox.svg"
+cardbackground = "#aa4444"
+cardtitlecolor = "#111111"
 +++
 
 [Dropbox](https://db.tt/NtB1w0kg) is a reliable and well-known service for synchronizing your files. But one shortcoming is that there is no way to selectively synchronize files outside of the main "Dropbox" folder. This matters when you are using Dropbox to synchronize files between computers in which other software expects those files to be in a certain place. In Windows, there is a very simple way to fix this.

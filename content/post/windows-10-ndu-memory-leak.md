@@ -3,12 +3,11 @@ date = "2015-11-22T11:21:56-05:00"
 draft = false
 title = "Windows 10 NDU Memory Leak"
 tags = [ "dropbox", "file-systems", "windows", "source-control", "emacs" ]
-icon = "windows.svg"
 +++
 
-## Symptom
+In Windows 10 (with a fresh install), "System" uses up a huge amount of memory in the non-paged pool. This is caused by faulty code that ships with Windows 10, either in `ndu.sys` or the Killer networking drivers.
 
-In Windows 10 (with a fresh install), "System" uses up a huge amount of memory
+<!--more-->
 
 ## Solution
 

@@ -3,7 +3,7 @@ date = "2015-05-24T17:20:51-04:00"
 draft = false
 title = "MongoDB 3 on Debian Jessie"
 tags = [ "mongodb", "debian", "jessie" ]
-icon = "logo-mongo.svg"
+cardthumbimage = "images/logo-mongo.svg"
 +++
 
 As of 2015-05-24, [the installation documentation](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-debian/) for MongoDB on Debian only included Wheezy (7). I found that it pretty much works fine on Jessie (8). But the installation as they had it had a couple problems:
