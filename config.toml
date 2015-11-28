@@ -4,3 +4,14 @@ title = "Hut 8"
 
 [taxonomies]
   tag = "tags"
+
+[params]
+    name = "Liam Bowen"
+    description = "Expert code typist"
+    image = "https://en.gravatar.com/userimage/18837740/eaff46218ca552eecafb126af527e08c.png?size=200"
+    website = "http://hut8.io"
+    email = "LiamBowen@gmail.com"
+    github = "https://github.com/hut8/"
+    copyrightyear = "2015"
+    frontpageposts = 6
+    
