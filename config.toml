@@ -3,6 +3,7 @@ languageCode = "en-us"
 title = "Hut 8"
 theme = "HugoMDL"
 MetaDataFormat = "yaml"
+googleAnalytics = "UA-62505154-1"
 
 [taxonomies]
   tag = "tags"
