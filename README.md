@@ -1,3 +1,3 @@
 # My blog
 
-http://hut8.io
+https://tilde.town/~hut8
