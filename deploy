@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 wanted_branch="master"
@@ -11,8 +11,9 @@ then
     exit 1
 fi
 
+export GOMAXPROCS=1
 hugo
-DEST="/www"
+DEST="$HOME/public_html"
 SOURCE="$(pwd)/public"
 
 current_release="$(git describe --long --dirty --always)"
@@ -20,6 +21,7 @@ echo "${current_release}" > "public/release.txt"
 
 echo "deploying ${current_release} $(pwd) -> ${DEST}"
 
-cp -ruv "${SOURCE}"/* "${DEST}"
+rm -rf "${SOURCE:?}"/*
+cp -ruv "${SOURCE:?}"/* "${DEST}"
 
 cowsay "deployed ${current_release} successfully"
