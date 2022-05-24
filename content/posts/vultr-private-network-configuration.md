@@ -21,7 +21,7 @@ This article is about how to configure it on Debian or Ubuntu.
 As root, we'll create a new file in `/etc/network/interfaces.d`. You can name it whatever you want; I named it `private`. It's a good idea to put a new file in `interfaces.d` rather than edit `/etc/network/interfaces` directly. This way, during upgrades, you don't have to merge files if the `interfaces` file changes. Make this file on each server, being careful to assign a unique IP address (one is suggested on the dashboard).
 
 ```none
-liam@lorenz ~ % cat /etc/network/interfaces.d/private
+hut8@lorenz ~ % cat /etc/network/interfaces.d/private
 auto eth1
 iface eth1 inet static
      address 10.99.0.10
@@ -34,7 +34,7 @@ As they note, you can actually use any private IP address that you want. They wi
 Then apply the change:
 
 ```none
-liam@lorenz ~ % sudo /etc/init.d/networking restart
+hut8@lorenz ~ % sudo /etc/init.d/networking restart
 ```
 
 That will not close your current connections, so you can do that over SSH.
@@ -42,7 +42,7 @@ That will not close your current connections, so you can do that over SSH.
 #### Speed test
 
 ```none
-liam@lorenz ~ % iperf -n 1024M -c crib                                                                                  ------------------------------------------------------------
+hut8@lorenz ~ % iperf -n 1024M -c crib                                                                                  ------------------------------------------------------------
 Client connecting to crib, TCP port 5001
 TCP window size: 45.0 KByte (default)
 ------------------------------------------------------------
@@ -60,7 +60,7 @@ TCP window size: 45.0 KByte (default)
 I was pretty disappointed at first when the MTU was set to (the default) 1500:
 
 ```none
-liam@lorenz ~ % iperf -n 1024M -c
+hut8@lorenz ~ % iperf -n 1024M -c
 ------------------------------------------------------------
 Client connecting to crib, TCP port 5001
 TCP window size: 45.0 KByte (default)

@@ -14,7 +14,7 @@ icon = "windows.svg"
 
 ## Junctions and Hard Links
 
-NTFS has two functions that help us here: [junction points](https://en.wikipedia.org/wiki/NTFS_junction_point) and [hard links](https://en.wikipedia.org/wiki/Hard_link). From Windows Explorer, neither of these can be created, so you'll have to use a CLI utility to make them. In these examples I have the `.emacs` file and `.emacs.d` directory right in my home folder (`C:\Users\Liam`) and want to store them in my Dropbox while keeping the original files.
+NTFS has two functions that help us here: [junction points](https://en.wikipedia.org/wiki/NTFS_junction_point) and [hard links](https://en.wikipedia.org/wiki/Hard_link). From Windows Explorer, neither of these can be created, so you'll have to use a CLI utility to make them. In these examples I have the `.emacs` file and `.emacs.d` directory right in my home folder (`C:\Users\User`) and want to store them in my Dropbox while keeping the original files.
 
 ### Junctions
 
@@ -24,7 +24,7 @@ There is a utility shipped with Windows 8, Windows Server 2008, Windows Server 2
 [mklink](https://technet.microsoft.com/en-us/library/cc753194.aspx) which streamlines creating junctions and hard links. But because I'm on Windows 7, I searched for this utility and it wasn't present on my hard drive. I do have all the latest Windows updates, so I can only assume that some sites I found that insist this exists on Windows 7 are wrong. Fortunately, [sysinternals](https://technet.microsoft.com/en-us/sysinternals/default) has a utility called [junction](https://technet.microsoft.com/en-us/sysinternals/bb896768.aspx) which exposes this functionality. So, to do what I want, it's just:
 
 ```shell
-junction C:\Users\Liam\Dropbox\Windows\.emacs.d C:\Users\Liam\.emacs.d
+junction C:\Users\User\Dropbox\Windows\.emacs.d C:\Users\User\.emacs.d
 ```
 
 Note the `destination` `source` order, which is the reverse of how real operating systems do it.
@@ -34,7 +34,7 @@ Note the `destination` `source` order, which is the reverse of how real operatin
 It seems as though all recent versions of Windows have [fsutil.exe](https://technet.microsoft.com/en-us/library/cc753059.aspx), but if you have `mklink`, that can do this too. Strangely, `fsutil.exe` can query and delete reparse points (of which junctions are a type) but cannot make them.
 
 ```shell
-fsutil hardlink create C:\Users\Liam\Dropbox\Windows\.emacs C:\Users\Liam\.emacs
+fsutil hardlink create C:\Users\User\Dropbox\Windows\.emacs C:\Users\User\.emacs
 ```
 
 ### On the other machines
