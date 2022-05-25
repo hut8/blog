@@ -2,26 +2,28 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+DEST="$HOME/public_html"
+SOURCE="$(pwd)/public"
+
 wanted_branch="master"
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 
-if [[ $current_branch != $wanted_branch ]];
+if [[ $current_branch != "$wanted_branch" ]];
 then
     echo "cannot deploy branch: ${current_branch} to production (must be ${wanted_branch})" 1>&2
     exit 1
 fi
 
+rm -rf "${DEST:?}"/*
+
 export GOMAXPROCS=1
 hugo
-DEST="$HOME/public_html"
-SOURCE="$(pwd)/public"
 
 current_release="$(git describe --long --dirty --always)"
 echo "${current_release}" > "public/release.txt"
 
-echo "deploying ${current_release} $(pwd) -> ${DEST}"
+echo "deploying ${current_release} ${SOURCE} -> ${DEST}"
 
-rm -rf "${SOURCE:?}"/*
-cp -ruv "${SOURCE:?}"/* "${DEST}"
+cp -rv "${SOURCE}"/* "${DEST}"
 
 cowsay "deployed ${current_release} successfully"
