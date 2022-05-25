@@ -2,6 +2,7 @@ baseURL = "https://tilde.town/~hut8"
 title = "Hut 8"
 languageCode = "en-us"
 theme = "hugo.386"
+canonifyURLs = true
 
 [params]
     # The name to display as main title in the home page
