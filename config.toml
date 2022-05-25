@@ -3,6 +3,7 @@ title = "Hut 8"
 languageCode = "en-us"
 theme = "hugo.386"
 canonifyURLs = true
+googleAnalytics = 'G-9GF1FJDV2S'
 
 [params]
     # The name to display as main title in the home page
@@ -34,10 +35,17 @@ canonifyURLs = true
     loadfastload = false
 
     # Sets the speed for the page loading effect. Default is 1.0.
-    loadspeedfactor = 1.0
+    loadspeedfactor = 1.5
 
     # Enables or disables the second flyby cursor. Default is false.
-    loadonepass = false
+    loadonepass = true
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "/post/"       # The path can lead to a content folder too.
+    weight = 20
 
 [taxonomies]
   tag = "tags"
