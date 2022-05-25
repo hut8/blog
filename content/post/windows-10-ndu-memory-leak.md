@@ -6,6 +6,8 @@ tags = [ "dropbox", "file-systems", "windows", "source-control", "emacs" ]
 icon = "windows.svg"
 +++
 
+## {{.Site.BaseURL}}
+
 ## Symptom
 
 In Windows 10 (with a fresh install), "System" uses up a huge amount of memory
