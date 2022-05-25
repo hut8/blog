@@ -1,6 +1,42 @@
-baseurl = "https://tilde.town/~hut8/staging/"
-languageCode = "en-us"
+baseURL = "https://tilde.town/~hut8"
 title = "Hut 8"
+languageCode = "en-us"
+theme = "hugo.386"
+
+[params]
+    # The name to display as main title in the home page
+    mainpagetitle = "HUT 8"
+
+    # The subtitle to display under the title in the home page
+    mainpagesubtitle = "blahg on tilde.town" 
+
+    # The description of your website. It will be displayed in the home page
+    mainpagedesc = "Ramblings about software"
+
+    # The name to display in the copyright section in the footer
+    copyrightname = "Liam"
+
+    # The url to use as link in the copyright name in the footer. Leave empty to use none.
+    copyrighturl = ""
+
+    # Show the "built on Hugo" disclaimer
+    showhugo = true
+
+    # Urls for social networks
+    facebook = ""
+    twitter = ""
+    linkedin = "https://linkedin.com/in/liambowen"
+    github = "https://github.com/hut8"
+    gitlab = "https://gitlab.com/liambowen"
+
+    # Enables or disables the loading animations. false activates them. Default is false.
+    loadfastload = false
+
+    # Sets the speed for the page loading effect. Default is 1.0.
+    loadspeedfactor = 1.0
+
+    # Enables or disables the second flyby cursor. Default is false.
+    loadonepass = false
 
 [taxonomies]
   tag = "tags"
