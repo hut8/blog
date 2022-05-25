@@ -89,3 +89,293 @@ example, how you would actually invoke these "client methods" in a
 statically typed way.
 
 ## Tunnel-based solution
+
+A great solution for decoupling the TCP client/server from the gRPC
+client/server is to implement some sort of tunnel. In the above
+example with a laptop and a cloud instance, the laptop can make a
+single TCP connection to the cloud instance, and then by implementing
+a language-specific interface, the "dial" operation to have the cloud
+instance (gRPC client) connect to the laptop (gRPC server) can simply
+use that existing TCP connection.
+
+SSH is an incredible protocol that has more uses than most of its
+users know of. In our case, it's a perfect way to decouple our TCP
+connection from the gRPC connection. It has other benefits too:
+although gRPC provides authentication and encryption, you can use
+those from SSH if it's more convenient.
+
+These examples are Go specific, but you can do something similar in
+any language. The gRPC server doesn't need to listen on a port; you
+can pass in any type that implement's Go's `net.Listener`. So we can
+make a `net.Listener` that will take an SSH connection, and any time a
+new SSH channel of our custom type is requested, then we will accept
+that and return a new `net.Conn`, which is another type that we will
+implement, that simply shuttles data over our tunnel.
+
+Let's start with the SSHDataTunnel, which is our `net.Conn`
+
+``` go
+import (
+  "net"
+  "time"
+  "golang.org/x/crypto/ssh"
+)
+
+// SSHDataTunnel implements net.Conn
+type SSHDataTunnel struct {
+    Chan ssh.Channel
+    Conn net.Conn
+}
+
+func NewSSHDataTunnel(sshChan ssh.Channel, carrier net.Conn)
+*SSHDataTunnel {
+    return &SSHDataTunnel{
+        Chan: sshChan,
+        Conn: carrier,
+    }
+}
+
+func (c *SSHDataTunnel) Read(b []byte) (n int, err error) {
+    return c.Chan.Read(b)
+}
+
+func (c *SSHDataTunnel) Write(b []byte) (n int, err error) {
+    return c.Chan.Write(b)
+}
+
+func (c *SSHDataTunnel) Close() error {
+    return c.Chan.Close()
+}
+
+func (c *SSHDataTunnel) LocalAddr() net.Addr {
+    return c.Conn.LocalAddr()
+}
+
+func (c *SSHDataTunnel) RemoteAddr() net.Addr {
+    return c.Conn.RemoteAddr()
+}
+
+func (c *SSHDataTunnel) SetDeadline(t time.Time) error {
+    return c.Conn.SetDeadline(t)
+}
+
+func (c *SSHDataTunnel) SetReadDeadline(t time.Time) error {
+    return c.Conn.SetReadDeadline(t)
+}
+
+func (c *SSHDataTunnel) SetWriteDeadline(t time.Time) error {
+    return c.Conn.SetWriteDeadline(t)
+}
+
+// Static checking for type
+var _ net.Conn = &SSHDataTunnel{}
+```
+
+That last line just ensures that our type actually does implement
+`net.Conn`, and won't compile if it doesn't.
+
+Now, when we `Read()` and `Write()` our new `*SSHDataTunnel`, the
+data is sent directly over a dedicated channel on an SSH
+connection.
+
+The `SSHChannelListener` is the `net.Listener` type that produces our `SSHDataTunnel`.
+
+
+``` go
+type SSHChannelListener struct {
+    // channel requests are essentially the same as incoming TCP connections
+    Chans   <-chan ssh.NewChannel
+    SSHConn ssh.Conn
+    TCPConn *net.TCPConn
+}
+
+// Accept waits for and returns the next connection to the listener.
+func (l *SSHChannelListener) Accept() (net.Conn, error) {
+    chanRq := <-l.Chans
+    if chanRq == nil {
+        return nil, net.ErrClosed
+    }
+    if chanRq.ChannelType() != "grpc-tunnel" {
+        chanRq.Reject(ssh.UnknownChannelType, "unknown channel type")
+        return nil, errors.New("could not accept on ssh channel listener: unknown channel type")
+    }
+    channel, reqs, err := chanRq.Accept()
+    if err != nil {
+        return nil, err
+    }
+    go ssh.DiscardRequests(reqs)
+    return &SSHDataTunnel{
+        Chan: channel,
+        Conn: l.TCPConn,
+    }, nil
+}
+
+// Close closes the listener.
+// Any blocked Accept operations will be unblocked and return errors.
+func (l *SSHChannelListener) Close() error {
+    return l.SSHConn.Close()
+}
+
+// Addr returns the listener's network address.
+func (l *SSHChannelListener) Addr() net.Addr {
+    return l.SSHConn.LocalAddr()
+}
+
+```
+
+Now we have adapters to use SSH in place of a `net.Listener` and
+`net.Conn`, which is what gRPC requires. We still need to set up the
+SSH connection itself to the cloud instance, in order
+to construct the `SSHChannelListener`. This will be done on the TCP
+client, which is the gRPC server (the "laptop").
+
+``` go
+// Connect makes an outgoing tunnel connection from the TCP client
+// (which is the gRPC server) to the TCP server
+func Connect() (*SSHChannelListener, error) {
+    // Resolve and connect over TCP
+    addr, err := net.ResolveTCPAddr("tcp4", ServerAddress)
+    if err != nil {
+        // real error handling here
+        return nil, err
+    }
+    conn, err := net.DialTCP("tcp", nil, addr)
+    if err != nil {
+        // real error handling here
+        return nil, err
+    }
+
+    // Using our TCP connection, establish an SSH connection
+    sshConn, chans, requests, err := ssh.NewClientConn(conn, ServerAddress, c.ClientConfig)
+    if err != nil {
+        // real error handling here
+        return nil, err
+    }
+    // ignore all requests (this does not include new channels)
+    go ssh.DiscardRequests(reqs)
+
+    return &SSHChannelListener{
+        Chans:   chans,
+        SSHConn: sshConn,
+        TCPConn: conn,
+    }, nil
+}
+
+```
+
+Using the new `SSHChannelListener` on the laptop is easy with
+gRPC. Assuming you have a service named `XServer` in a package
+`protocol`:
+
+``` go
+listener, err := Connect()
+if err != nil {
+    // real error handling here
+    panic(err}
+}
+s := grpc.NewServer()
+protocol.RegisterXServer(s, &xServer{})
+s.Serve(listener)
+```
+
+On the cloud instance (TCP server/gRPC client) we can have the gRPC
+connect easily as well. First we will define a function that satisfies
+`grpc.WithContextDialer`:
+
+``` go
+ func (c *Client) SSHConnDialer(context.Context, string) (net.Conn, error) {
+     sshChan, reqs, err := c.sshConn.OpenChannel("grpc-tunnel", nil)
+     if err != nil {
+             return nil, err
+     }
+     go ssh.DiscardRequests(reqs)
+     conn := &SSHConn{
+             Chan: sshChan,
+             Conn: nConn,
+     }
+     return conn, nil
+}
+```
+
+And now we will use that dialer on the cloud instance to construct the
+gRPC client:
+
+``` go
+grpcConn, err := grpc.Dial(ServerAddress,
+    grpc.WithContextDialer(sshConnDialer),
+    grpc.WithBlock(),
+    grpc.WithTransportCredentials(insecure.NewCredentials()))
+if err != nil {
+    // real error handling here
+    panic(err)
+}
+defer grpcConn.Close()
+svc := protocol.NewXClient(grpcConn)
+
+// Now you can use svc like a normal client:
+svc.Frobulate()
+```
+
+## Handling Disconnects
+
+Detecting and handling disconnects with `gRPC` can be a bit tricky so
+I will outline one approach here. Instead of invoking a method on the
+client side and getting an error (which is, of course, one way of
+detecting disconnects), we can use a `grpc.Handler` to provide some
+sort of notification as soon as a disconnect is detected. Using a
+`chan` makes this really easy. The cloud instance (TCP server/gRPC
+client) will just need a few more lines of code.
+
+``` go
+type DisconnectDetector struct {
+    // add a logger or something too, if you want it
+    CloseChan chan struct{}
+}
+
+// NewDisconnectDetector returns a valid DisconnectDetector
+func NewDisconnectDetector() *DisconnectDetector {
+    return &DisconnectDetector{
+        CloseChan: make(chan struct{}),
+    }
+}
+
+// TagRPC is a no-op
+func (h *DisconnectDetector) TagRPC(context.Context, *stats.RPCTagInfo) context.Context {
+    return context.Background()
+}
+
+// HandleRPC is a no-op
+func (h *DisconnectDetector) HandleRPC(context.Context, stats.RPCStats) {
+}
+
+// TagConn is a no-op
+func (h *DisconnectDetector) TagConn(context.Context, *stats.ConnTagInfo) context.Context {
+    return context.Background()
+}
+
+// HandleConn processes the Conn stats.
+func (h *DisconnectDetector) HandleConn(c context.Context, s stats.ConnStats) {
+    switch s.(type) {
+    case *stats.ConnEnd:
+        h.CloseChan <- struct{}{}
+    }
+}
+```
+
+
+In the `grpc.Dial` call above, we can add another parameter:
+
+``` go
+disconnectDetector := NewDisconnectDetector()
+grpc.Dial( // same as before, plus:
+    grpc.WithStatsHandler(disconnectDetector))
+```
+
+Now whenever you want to be notified of a disconnection (in a separate
+goroutine), just use:
+
+
+``` go
+<- disconnectDetector.CloseChan
+// ... code to run upon disconnection
+```
